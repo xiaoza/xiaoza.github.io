@@ -4,9 +4,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
+  <link href="http://iszhenyu.me/"/>
   <updated>2016-08-30T15:18:08.000Z</updated>
-  <id>http://yoursite.com/</id>
+  <id>http://iszhenyu.me/</id>
   
   <author>
     <name>zhenyu</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>MongoDB索引</title>
-    <link href="http://yoursite.com/posts/2016-08-30-MongoDB%E7%B4%A2%E5%BC%95.html"/>
-    <id>http://yoursite.com/posts/2016-08-30-MongoDB索引.html</id>
+    <link href="http://iszhenyu.me/posts/2016-08-30-MongoDB%E7%B4%A2%E5%BC%95.html"/>
+    <id>http://iszhenyu.me/posts/2016-08-30-MongoDB索引.html</id>
     <published>2016-08-30T15:17:32.000Z</published>
     <updated>2016-08-30T15:18:08.000Z</updated>
     
@@ -27,14 +27,14 @@
     </summary>
     
     
-      <category term="mongo" scheme="http://yoursite.com/tags/mongo/"/>
+      <category term="mongo" scheme="http://iszhenyu.me/tags/mongo/"/>
     
   </entry>
   
   <entry>
     <title>Hello World</title>
-    <link href="http://yoursite.com/posts/2016-08-26-hello-world.html"/>
-    <id>http://yoursite.com/posts/2016-08-26-hello-world.html</id>
+    <link href="http://iszhenyu.me/posts/2016-08-26-hello-world.html"/>
+    <id>http://iszhenyu.me/posts/2016-08-26-hello-world.html</id>
     <published>2016-08-26T10:24:14.000Z</published>
     <updated>2016-08-26T10:24:14.000Z</updated>
     
