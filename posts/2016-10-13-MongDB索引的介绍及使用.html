@@ -1,0 +1,108 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> MongoDB索引的介绍及使用 · zhenyu</title><meta name="description" content="MongoDB索引的介绍及使用 - zhenyu"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="short icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://iszhenyu.me/atom.xml" title="zhenyu"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://github.com/xiaoza" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><section class="container"><div class="post"><article class="post-block"><h1 class="post-title">MongoDB索引的介绍及使用</h1><div class="post-info">Oct 13, 2016</div><div class="post-content"><p>索引的重要性，应该无需多说了，它可以优化我们的查询，而且在某些特定类型的查询中，索引几乎是必不可少的。这篇文章主要介绍了MongoDB中的几种常见的索引以及在使用时候的一些注意事项。这几种索引基本上涵盖了我们在平时开发的时候会遇到的大部分情况，但是，仍然需要注意的是，这篇文章没有涉及一些特殊的索引，比如TTL索引、全文本索引和地理空间索引，想要了解这几个索引的同学在这里可能得不到想要的答案。</p>
+<h2 id="单一索引"><a href="#单一索引" class="headerlink" title="单一索引"></a>单一索引</h2><p>单一索引应该是MongoDB里最简单和最容易理解的索引，但由于MongoDB是一个非关系型数据库，它的索引结构跟常见的关系型数据库（例如MySQL）又有所不同。</p>
+<h3 id="1、在单一字段上建立索引"><a href="#1、在单一字段上建立索引" class="headerlink" title="1、在单一字段上建立索引"></a>1、在单一字段上建立索引</h3><p>假设我们有一个名为records 的 collection ，其中存储的文档格式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  &quot;_id&quot;: ObjectId(&quot;570c04a4ad233577f97dc459&quot;),</div><div class="line">  &quot;score&quot;: 1034,</div><div class="line">  &quot;location&quot;: &#123; state: &quot;NY&quot;, city: &quot;New York&quot; &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们希望在<code>score</code>字段上建立<code>升序</code>索引，可以执行如下语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.records.createIndex(&#123;score:1&#125;)</div></pre></td></tr></table></figure>
+<p>其中<code>1</code>代表索引按升序排列各项，<code>-1</code>代表按降序排列。这个索引支持在<code>score</code>字段进行查询，例如下面的查询语句：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">db.records.find(&#123;score: 2&#125;)</div><div class="line">db.records.find(&#123;score: &#123;$gt: 10&#125;&#125;)</div></pre></td></tr></table></figure>
+<h3 id="2、在内嵌文档字段上建立索引"><a href="#2、在内嵌文档字段上建立索引" class="headerlink" title="2、在内嵌文档字段上建立索引"></a>2、在内嵌文档字段上建立索引</h3><p>同样，我们也可以在一个嵌入文档的字段上建立索引，注意这里是针对嵌入文档的某一个字段建立索引。还是考虑上面的文档，我们希望在location的state字段建立索引，可以如下操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.records.createIndex(&#123;&quot;location.state&quot;: 1&#125;)</div></pre></td></tr></table></figure>
+<p>也就是，内嵌文档与字段之间用<code>.</code>分割就可以了。这个索引支持如下的查询：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">db.records.find(&#123;&quot;location.state&quot;: &quot;CA&quot;&#125;)</div><div class="line">db.records.find(&#123;&quot;location.city&quot;: &quot;Albany&quot;, &quot;location.state&quot;: &quot;NY&quot;&#125;)</div></pre></td></tr></table></figure>
+<p>注意这里的第二个查询语句，<code>location.state</code>并不是第一位的查询条件，因为我们已经在<code>location.state</code>上加了索引，mongo会优先使用索引查询，所以这条语句也是有效的。</p>
+<h3 id="3、在内嵌文档上建立索引"><a href="#3、在内嵌文档上建立索引" class="headerlink" title="3、在内嵌文档上建立索引"></a>3、在内嵌文档上建立索引</h3><p>在上面的例子中，<code>location</code>字段是一个内嵌文档，我们可以针对整个<code>location</code>字段来建立索引，这里需要注意与在内嵌文档字段上建立索引的区别</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.records.createIndex(&#123;location: 1&#125;)</div></pre></td></tr></table></figure>
+<p>考虑下面的查询语句</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.records.find(&#123;location: &#123;city: &quot;New York&quot;, state: &quot;NY&quot;&#125;&#125;)</div></pre></td></tr></table></figure>
+<p>这条查询语句虽然可以使用这个刚刚建立的索引，但是却无法获取到正确的数据，因为在内嵌文档上执行精确匹配时，字段的顺序也必须跟内嵌文档中的字段顺序一致。</p>
+<blockquote>
+<p>我们上面构建索引的方式都是阻塞式的，也就是当我们在构建索引的时候，所有的数据都不可访问，直到索引构建完毕，这在正式环境中是绝对无法忍受的，解决这个问题也很简单，我们只要传递<code>background</code>参数就可以了，像下面这样<code>db.people.createIndex( { zipcode: 1}, {background: true} )</code>，这样mongo会在后台构建索引而不会阻塞其他的操作。</p>
+</blockquote>
+<h2 id="复合索引"><a href="#复合索引" class="headerlink" title="复合索引"></a>复合索引</h2><p>简单来说，复合索引就是一个建立在多个字段上的索引。我们在正式开发的时候，很多查询条件都不是单一的，甚至有的时候排序方向都未必是单一的，这个时候复合索引就变得非常有用了。它的功能很强大，但同时，使用起来也很复杂。</p>
+<h3 id="1、建立一个复合索引"><a href="#1、建立一个复合索引" class="headerlink" title="1、建立一个复合索引"></a>1、建立一个复合索引</h3><p>建立复合索引的语法是这样的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.collection.createIndex(&#123;&lt;field1&gt;: &lt;type&gt;, &lt;field2&gt;: &lt;type&gt;,...&#125;)</div></pre></td></tr></table></figure>
+<p>其中，<code>&lt;type&gt;</code>指的就是那个字段索引的类型，比如为1说明是升序，-1说明是降序。</p>
+<p>考虑一个名为<code>products</code>的collection，其中的文档如下所示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line"> &quot;_id&quot;: ObjectId(...),</div><div class="line"> &quot;item&quot;: &quot;Banana&quot;,</div><div class="line"> &quot;category&quot;: [&quot;food&quot;, &quot;produce&quot;, &quot;grocery&quot;],</div><div class="line"> &quot;location&quot;: &quot;4th Street Store&quot;,</div><div class="line"> &quot;stock&quot;: 4,</div><div class="line"> &quot;type&quot;: &quot;cases&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以使用如下的语句在<code>item</code>和<code>stock</code>上建立了复合索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.products.createIndex(&#123;&quot;item&quot;: 1, &quot;stock&quot;: 1&#125;)</div></pre></td></tr></table></figure>
+<p>在这里，<code>item</code>和<code>stock</code>的顺序很重要，这个索引指向的文档首先会根据item字段来排序，而针对每个item字段值，会再根据stock字段来排序。</p>
+<p>除了支持匹配所有索引字段的查询外，复合索引还支持匹配索引字段前缀的查询，例如，在建立上面的复合索引后，下面的查询语句也是被索引支持的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">db.products.find(&#123;item: &quot;Banana&quot;&#125;)</div><div class="line">db.products.find(&#123;item: &quot;Banana&quot;, stock: &#123;$gt : 5&#125;&#125;)</div></pre></td></tr></table></figure>
+<h3 id="2、索引键的方向"><a href="#2、索引键的方向" class="headerlink" title="2、索引键的方向"></a>2、索引键的方向</h3><p>对于单一字段索引来说，按升序或降序排序是无关紧要的，因为MongoDB可以在相反的方向上来反转索引，然而对于复合索引，排序的次序问题就会对索引是否支持排序操作产生影响。</p>
+<p>考虑一个名为<code>events</code>的集合，里面的每个文档都包括<code>username</code>和<code>date</code>字段，现在有一个查询，希望将结果按username升序，date降序排列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.events.find().sort(&#123;username: 1, date: -1&#125;)</div></pre></td></tr></table></figure>
+<p>或者是将username降序date升序排列</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.events.find().sort(&#123;username: -1, date: 1&#125;)</div></pre></td></tr></table></figure>
+<p>因为相互翻转（在每个方向上都乘以-1）的索引是等效的，所以，为了支持上面两种查询操作，可以建立如下的索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.events.createIndex(&#123;&quot;username&quot;: 1, &quot;date&quot;: -1&#125;)</div></pre></td></tr></table></figure>
+<p>但是这个索引并不支持按username升序和date升序排列，也就是下面的查询是无法使用上面的索引的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.events.find().sort(&#123;username: 1, date: 1&#125;)</div></pre></td></tr></table></figure>
+<p>那如果你真的是还有<code>{username: 1, date: 1}</code>这种排序需求，就只能再创建一个这个方向上的索引。</p>
+<blockquote>
+<p>只有基于多个查询条件进行排序时，索引的方向才是比较重要的，如果只是基于单一的键进行排序，MongoDB可以简单的从相反方向读取索引。</p>
+</blockquote>
+<h3 id="3、索引前缀"><a href="#3、索引前缀" class="headerlink" title="3、索引前缀"></a>3、索引前缀</h3><p>索引前缀就是索引字段的前几个字段，简单来说，如果有一个拥有N个键的索引，那么我们同时也得到了所有这N个键的前缀组成的索引。例如，有一个索引，它的结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;&quot;item&quot;: 1, &quot;location&quot;: 1, &quot;stock&quot;: 1&#125;</div></pre></td></tr></table></figure>
+<p>那么，也就意味着下面这两个索引也是可用的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&#123; item: 1 &#125;</div><div class="line">&#123; item: 1, location: 1 &#125;</div></pre></td></tr></table></figure>
+<p>因此，如果我们的查询条件中包括以下几个字段，那么MongoDB就会使用到这个索引</p>
+<ol>
+<li>item 字段</li>
+<li>item 和 location 字段</li>
+<li>item 和 location 和 stock 字段</li>
+</ol>
+<p>而在下面的几个字段上是无法使用这个索引的</p>
+<ol>
+<li>location 字段</li>
+<li>stock 字段</li>
+<li>location 和 stock 字段</li>
+</ol>
+<p>最后我们考虑另外一种情况，假设我们现在有个如下所示的查询条件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123; item: xx, stock: xx &#125;</div></pre></td></tr></table></figure></p>
+<p>那么这个查询会用到上面创建的索引吗？答案是肯定的，因为item字段可以看成是一个索引前缀，所以mongo首先会按item来查询，但是对于stock字段就无能为力了，因此，如果我们希望进一步加速上面的查询，则需要在<code>item</code>和<code>stock</code>两个字段上再建立索引。</p>
+<h2 id="多键值索引"><a href="#多键值索引" class="headerlink" title="多键值索引"></a>多键值索引</h2><p>多键值索引又叫数组索引，它是为了能够高效搜索数组中特定元素而创建的索引。为了数组字段上建立索引，MongoDB会为数组中的每个元素建立索引条目，这也是为什么将数组索引称为多键值索引的原因。创建数组索引对数组中的元素类型没有太多要求，无论数组中元素是标量值（eg. strings、numbers）还是内嵌文档都是可以的。</p>
+<p>可以使用如下的语法来创建数组索引<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.collection.createIndex(&#123;&lt;field&gt;: &lt;1 or -1&gt;&#125;)</div></pre></td></tr></table></figure></p>
+<p>我们发现，这与创建普通索引的语法是一样的，而不需要我们显示的指定为多键值索引，如果索引的字段是一个数组，MongoDB会自动创建为多键值索引。</p>
+<p>我们在第二节提到了复合索引，并且在官方文档上也有明确标明：一个索引中的数组字段最多只能有一个。例如下面的文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	_id: 1,</div><div class="line">	a: [1, 2],</div><div class="line">	b: [1, 2],</div><div class="line">	category: &quot;AB - both arrays&quot;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们是无法创建<code>{a: 1, b: 1}</code>这样的复合多键索引的，因为a和b字段都为数组。那么我们不禁要问，问什么不可以呢？</p>
+<p>我们知道，对于数组索引来说，数组中的每个元素都会被索引，假如字段a的元素个数为5，那么就要创建5条索引条目，而像上面的例子，a、b字段上每一对可能的元素都要被索引，也就是一共会有2 × 2个索引条目，当数组的长度很大时，索引的条目就会爆炸性增长，因此，为了避免这个问题，MongoDB规定只能最多有一个数组字段。</p>
+<p>但是考虑另外一种情况，一个集合里面包含如下的文档：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">&#123; </div><div class="line">	_id: 1, </div><div class="line">	a: [1, 2], </div><div class="line">	b: 1, </div><div class="line">	category: &quot;A array&quot; </div><div class="line">&#125;</div><div class="line">&#123; </div><div class="line">	_id: 2, </div><div class="line">	a: 1, </div><div class="line">	b: [1, 2], </div><div class="line">	category: &quot;B array&quot; </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>一个复合多键索引<code>{a: 1, b: 1}</code>是允许的，因为对于每一个文档，只有一个字段为数组。当这个索引建立后，如果你尝试插入一条a和b都为数组的数据，将导致失败。</p>
+<p>下面通过几个例子来更好的了解数组索引。</p>
+<p><strong>索引基本数组</strong><br>考虑一个集合：survey，它存储了如下形式的文档：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">	_id: 1,</div><div class="line">	item: &quot;ABC&quot;,</div><div class="line">	ratings: [2, 5, 9]</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们在ratings字段建立索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.survey.createIndex(&#123;ratings: 1&#125;)</div></pre></td></tr></table></figure>
+<p>因为ratings字段包含数组，索引ratings上的索引为多键值索引，这个多键值索引包含如下三个索引键，每一个都指向了相同的文档：</p>
+<ul>
+<li>2</li>
+<li>5</li>
+<li>9</li>
+</ul>
+<p><strong>索引元素为嵌入文档的数组</strong></p>
+<p>考虑下面的文档</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  _id: 1,</div><div class="line">  item: &quot;abc&quot;,</div><div class="line">  stock: [</div><div class="line">    &#123; size: &quot;S&quot;, color: &quot;red&quot;, quantity: 25 &#125;,</div><div class="line">    &#123; size: &quot;S&quot;, color: &quot;blue&quot;, quantity: 10 &#125;,</div><div class="line">    &#123; size: &quot;M&quot;, color: &quot;blue&quot;, quantity: 50 &#125;</div><div class="line">  ]</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  _id: 2,</div><div class="line">  item: &quot;def&quot;,</div><div class="line">  stock: [</div><div class="line">    &#123; size: &quot;S&quot;, color: &quot;blue&quot;, quantity: 20 &#125;,</div><div class="line">    &#123; size: &quot;M&quot;, color: &quot;blue&quot;, quantity: 5 &#125;,</div><div class="line">    &#123; size: &quot;M&quot;, color: &quot;black&quot;, quantity: 10 &#125;,</div><div class="line">    &#123; size: &quot;L&quot;, color: &quot;red&quot;, quantity: 2 &#125;</div><div class="line">  ]</div><div class="line">&#125;</div><div class="line">&#123;</div><div class="line">  _id: 3,</div><div class="line">  item: &quot;ijk&quot;,</div><div class="line">  stock: [</div><div class="line">    &#123; size: &quot;M&quot;, color: &quot;blue&quot;, quantity: 15 &#125;,</div><div class="line">    &#123; size: &quot;L&quot;, color: &quot;blue&quot;, quantity: 100 &#125;,</div><div class="line">    &#123; size: &quot;L&quot;, color: &quot;red&quot;, quantity: 25 &#125;</div><div class="line">  ]</div><div class="line">&#125;</div><div class="line"></div><div class="line">...</div></pre></td></tr></table></figure>
+<p>下面的语句在 stock.size 和 stock.quantity 字段上建立了多键值索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">db.inventory.createIndex( &#123; &quot;stock.size&quot;: 1, &quot;stock.quantity&quot;: 1 &#125; )</div></pre></td></tr></table></figure>
+<p>如下的查询语句都是OK的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">db.inventory.find( &#123; &quot;stock.size&quot;: &quot;M&quot; &#125; )</div><div class="line">db.inventory.find( &#123; &quot;stock.size&quot;: &quot;S&quot;, &quot;stock.quantity&quot;: &#123; $gt: 20 &#125; &#125; )</div><div class="line">db.inventory.find( ).sort( &#123; &quot;stock.size&quot;: 1, &quot;stock.quantity&quot;: 1 &#125; )</div><div class="line">db.inventory.find( &#123; &quot;stock.size&quot;: &quot;M&quot; &#125; ).sort( &#123; &quot;stock.quantity&quot;: 1 &#125; )</div></pre></td></tr></table></figure>
+<h2 id="使用索引"><a href="#使用索引" class="headerlink" title="使用索引"></a>使用索引</h2><p>了解索引只是我们使用的第一步，我们最终的目的是能够高效的利用它们，因此，我们在创建索引的时候就要很清楚的知道，哪些查询是完全无法使用索引的，哪些查询是可以比其他查询能够更高效使用索引的。为了能够达到这一点，我们就需要了解MongoDB对各种不同查询操作符是怎么处理的。</p>
+<h3 id="操作符"><a href="#操作符" class="headerlink" title="$操作符"></a>$操作符</h3><p><strong>$where</strong><br>这种情况是完全无法使用索引，索引查询中尽量避免使用<code>$where</code>。</p>
+<p><strong>$exists</strong><br>无法使用索引，因为在索引中，不存在的字段和null字段的存储方式是一样的，查询必须遍历每一个文档检查这个值是否真的为null还是根本不存在。</p>
+<p><strong>$ne</strong><br>可以使用索引，但是不高效，因为要查看所有的索引条目。</p>
+<p><strong>$not</strong><br>有时能使用索引，但通常MongoDB并不知道如何去使用，对与基本的范围查询和正则表达式查询，MongoDB会进行反转，例如<code>{&quot;key&quot;: {&quot;$lt&quot;: 7}}</code>会变成<code>{&quot;key&quot;: {&quot;$gte&quot;: 7}}</code>，但是大部分时候这种查询会退化为全表扫描。</p>
+<p><strong>$nin</strong><br>这个查询和<code>$where</code>的行为一样，总是会进行全表扫描，因此也要极力避免使用。</p>
+<h3 id="何时不使用索引"><a href="#何时不使用索引" class="headerlink" title="何时不使用索引"></a>何时不使用索引</h3><p>大部分时候，索引都可以帮助我们高效的获取结果，但也有一些查询不使用索引会更快。因为使用索引需要进行两次查询，一次是查找索引条目，一次是根据索引指针去查找相应的文档，所以，如果我们要查找的结果集在原集合中所占的比例越大，索引的速度就越慢，而全表扫描只进行一次文档的查找。一般来说，如果查询需要返回集合内30%或者更多的数据，就需要对使用索引和全表扫描的速度进行比较，从而决定是否需要使用索引。</p>
+</div></article></div></section><footer><div class="paginator"><a href="/posts/2016-09-07-python中的datetime模块.html" class="next">下一篇</a></div><div data-thread-key="posts/2016-10-13-MongDB索引的介绍及使用.html" data-title="MongoDB索引的介绍及使用" data-url="http://iszhenyu.me/posts/2016-10-13-MongDB索引的介绍及使用.html" data-author-key="1" class="ds-thread"></div><script>var duoshuoQuery = {short_name:"iszhenyu"};
+(function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+
+</script><div class="copyright"><p>© 2015 - 2016 <a href="http://iszhenyu.me">zhenyu</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
