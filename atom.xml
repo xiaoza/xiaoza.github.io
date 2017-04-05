@@ -4,9 +4,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://iszhenyu.me/"/>
+  <link href="http://xiaoza.github.io/"/>
   <updated>2017-03-26T13:02:26.000Z</updated>
-  <id>http://iszhenyu.me/</id>
+  <id>http://xiaoza.github.io/</id>
   
   <author>
     <name>zhenyu</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>基于Flask，构建自己的Web框架</title>
-    <link href="http://iszhenyu.me/posts/2017-03-26-%E5%9F%BA%E4%BA%8EFlask%EF%BC%8C%E6%9E%84%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84Web%E6%A1%86%E6%9E%B6.html"/>
-    <id>http://iszhenyu.me/posts/2017-03-26-基于Flask，构建自己的Web框架.html</id>
+    <link href="http://xiaoza.github.io/posts/2017-03-26-%E5%9F%BA%E4%BA%8EFlask%EF%BC%8C%E6%9E%84%E5%BB%BA%E8%87%AA%E5%B7%B1%E7%9A%84Web%E6%A1%86%E6%9E%B6.html"/>
+    <id>http://xiaoza.github.io/posts/2017-03-26-基于Flask，构建自己的Web框架.html</id>
     <published>2017-03-26T13:00:31.000Z</published>
     <updated>2017-03-26T13:02:26.000Z</updated>
     
@@ -40,14 +40,14 @@
     </summary>
     
     
-      <category term="Flask" scheme="http://iszhenyu.me/tags/Flask/"/>
+      <category term="Flask" scheme="http://xiaoza.github.io/tags/Flask/"/>
     
   </entry>
   
   <entry>
     <title>当我们在使用Flask时，如何如记录日志</title>
-    <link href="http://iszhenyu.me/posts/2017-01-25-%E5%BD%93%E6%88%91%E4%BB%AC%E5%9C%A8%E4%BD%BF%E7%94%A8Flask%E6%97%B6%EF%BC%8C%E5%A6%82%E4%BD%95%E5%A6%82%E8%AE%B0%E5%BD%95%E6%97%A5%E5%BF%97.html"/>
-    <id>http://iszhenyu.me/posts/2017-01-25-当我们在使用Flask时，如何如记录日志.html</id>
+    <link href="http://xiaoza.github.io/posts/2017-01-25-%E5%BD%93%E6%88%91%E4%BB%AC%E5%9C%A8%E4%BD%BF%E7%94%A8Flask%E6%97%B6%EF%BC%8C%E5%A6%82%E4%BD%95%E5%A6%82%E8%AE%B0%E5%BD%95%E6%97%A5%E5%BF%97.html"/>
+    <id>http://xiaoza.github.io/posts/2017-01-25-当我们在使用Flask时，如何如记录日志.html</id>
     <published>2017-01-25T02:29:29.000Z</published>
     <updated>2017-01-25T02:29:33.000Z</updated>
     
@@ -133,14 +133,14 @@
     </summary>
     
     
-      <category term="Flask" scheme="http://iszhenyu.me/tags/Flask/"/>
+      <category term="Flask" scheme="http://xiaoza.github.io/tags/Flask/"/>
     
   </entry>
   
   <entry>
     <title>MongoDB索引的介绍及使用</title>
-    <link href="http://iszhenyu.me/posts/2016-10-13-MongDB%E7%B4%A2%E5%BC%95%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BD%BF%E7%94%A8.html"/>
-    <id>http://iszhenyu.me/posts/2016-10-13-MongDB索引的介绍及使用.html</id>
+    <link href="http://xiaoza.github.io/posts/2016-10-13-MongDB%E7%B4%A2%E5%BC%95%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BD%BF%E7%94%A8.html"/>
+    <id>http://xiaoza.github.io/posts/2016-10-13-MongDB索引的介绍及使用.html</id>
     <published>2016-10-13T10:47:32.000Z</published>
     <updated>2016-10-13T10:46:19.000Z</updated>
     
@@ -250,14 +250,14 @@
     </summary>
     
     
-      <category term="mongo" scheme="http://iszhenyu.me/tags/mongo/"/>
+      <category term="mongo" scheme="http://xiaoza.github.io/tags/mongo/"/>
     
   </entry>
   
   <entry>
     <title>python中的datetime模块</title>
-    <link href="http://iszhenyu.me/posts/2016-09-07-python%E4%B8%AD%E7%9A%84datetime%E6%A8%A1%E5%9D%97.html"/>
-    <id>http://iszhenyu.me/posts/2016-09-07-python中的datetime模块.html</id>
+    <link href="http://xiaoza.github.io/posts/2016-09-07-python%E4%B8%AD%E7%9A%84datetime%E6%A8%A1%E5%9D%97.html"/>
+    <id>http://xiaoza.github.io/posts/2016-09-07-python中的datetime模块.html</id>
     <published>2016-09-07T06:17:32.000Z</published>
     <updated>2016-09-07T10:14:36.000Z</updated>
     
@@ -368,14 +368,14 @@
     </summary>
     
     
-      <category term="python" scheme="http://iszhenyu.me/tags/python/"/>
+      <category term="python" scheme="http://xiaoza.github.io/tags/python/"/>
     
   </entry>
   
   <entry>
     <title>Android中与js进行交互</title>
-    <link href="http://iszhenyu.me/posts/2016-07-01-Android%E4%B8%AD%E4%B8%8Ejs%E8%BF%9B%E8%A1%8C%E4%BA%A4%E4%BA%92.html"/>
-    <id>http://iszhenyu.me/posts/2016-07-01-Android中与js进行交互.html</id>
+    <link href="http://xiaoza.github.io/posts/2016-07-01-Android%E4%B8%AD%E4%B8%8Ejs%E8%BF%9B%E8%A1%8C%E4%BA%A4%E4%BA%92.html"/>
+    <id>http://xiaoza.github.io/posts/2016-07-01-Android中与js进行交互.html</id>
     <published>2016-07-01T09:53:49.000Z</published>
     <updated>2016-09-07T06:26:54.000Z</updated>
     
@@ -448,14 +448,14 @@
     </summary>
     
     
-      <category term="android" scheme="http://iszhenyu.me/tags/android/"/>
+      <category term="android" scheme="http://xiaoza.github.io/tags/android/"/>
     
   </entry>
   
   <entry>
     <title>Picasso源码解析</title>
-    <link href="http://iszhenyu.me/posts/2016-06-29-Picasso%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.html"/>
-    <id>http://iszhenyu.me/posts/2016-06-29-Picasso源码解析.html</id>
+    <link href="http://xiaoza.github.io/posts/2016-06-29-Picasso%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90.html"/>
+    <id>http://xiaoza.github.io/posts/2016-06-29-Picasso源码解析.html</id>
     <published>2016-06-29T03:22:07.000Z</published>
     <updated>2016-09-07T06:13:16.000Z</updated>
     
@@ -521,7 +521,7 @@
     </summary>
     
     
-      <category term="android" scheme="http://iszhenyu.me/tags/android/"/>
+      <category term="android" scheme="http://xiaoza.github.io/tags/android/"/>
     
   </entry>
   
